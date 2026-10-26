@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { SaleData } from "@/types/sale";
 
@@ -113,6 +113,8 @@ export function SalePanel({ data }: SalePanelProps) {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [confirmed, setConfirmed] = useState(false);
   const [message, setMessage] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+const dropdownRef = useRef<HTMLDivElement>(null);
 
   const progress =
     data.targetAmount > 0
@@ -156,22 +158,54 @@ export function SalePanel({ data }: SalePanelProps) {
         <label className="block text-[10px] text-zinc-500" htmlFor="panel-view">
           Preview a reference panel state
         </label>
-        <select
-          id="panel-view"
-          value={view}
-          onChange={(event) => {
-            setView(event.target.value as PanelView);
+       <div
+  ref={dropdownRef}
+  className="relative mt-2"
+  onMouseEnter={() => setDropdownOpen(true)}
+  onMouseLeave={() => setDropdownOpen(false)}
+>
+  <button
+    type="button"
+    aria-expanded={dropdownOpen}
+    onClick={() => setDropdownOpen((open) => !open)}
+    onKeyDown={(event) => {
+      if (event.key === "Escape") setDropdownOpen(false);
+    }}
+    className="flex w-full items-center justify-between border border-orange-900 bg-black px-3 py-3 text-xs text-white hover:border-orange-500"
+  >
+    <span>{views.find((item) => item.value === view)?.label}</span>
+    <span
+      className={`mr-1 inline-block h-2 w-2 rotate-45 border-b-2 border-r-2 border-current transition-transform duration-200 ${
+        dropdownOpen ? "rotate-[225deg]" : ""
+      }`}
+    />
+  </button>
+
+  {dropdownOpen && (
+    <div className="absolute left-0 right-0 top-full z-20 border border-orange-900 bg-[#0a0604]">
+      {views.map((item) => (
+        <button
+          key={item.value}
+          type="button"
+          onClick={() => {
+            setView(item.value);
             setMessage("");
             setConfirmed(false);
+            setDropdownOpen(false);
           }}
-          className="mt-2 w-full border border-orange-900 bg-black px-3 py-3 text-xs text-white outline-none focus:border-orange-500"
+          className={`block w-full px-3 py-3 text-left text-xs transition-colors hover:bg-orange-950/60 hover:text-orange-400 ${
+            view === item.value
+              ? "bg-orange-950/40 text-orange-400"
+              : "text-zinc-300"
+          }`}
         >
-          {views.map((item) => (
-            <option key={item.value} value={item.value}>
-              {item.label}
-            </option>
-          ))}
-        </select>
+          {view === item.value ? "✓ " : ""}
+          {item.label}
+        </button>
+      ))}
+    </div>
+  )}
+</div>
       </div>
 
       {view === "overview" && (

@@ -89,9 +89,11 @@ export function Footer() {
         </div>
       </div>
 
+      {/* Large DEMO wordmark */}
       <div className="overflow-hidden border-t border-orange-950/40 px-3 pt-4">
-        <p className="select-none text-center text-[20vw] font-black leading-[0.8] tracking-[-0.07em] text-[#190600] sm:text-[19vw]">
-          DEMO
+        <p className="select-none whitespace-nowrap text-center font-sans text-[20vw] font-black leading-[0.8] tracking-[-0.065em] sm:text-[19vw]">
+          <span className="text-[#FF4D0A]">D</span>
+          <span className="text-[#190600]">EMO</span>
         </p>
       </div>
 
