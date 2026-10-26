@@ -36,7 +36,7 @@ function ExternalLinkIcon() {
       strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-6 w-6 shrink-0"
+      className="h-5 w-5 shrink-0"
       aria-hidden="true"
     >
       <path d="M13 5h6v6" />
@@ -82,6 +82,7 @@ export function Navbar() {
 
   function selectAccountAction(option: string) {
     setOpenMenu(null);
+    setMobileOpen(false);
 
     if (option === "Help") {
       window.location.href =
@@ -98,17 +99,56 @@ export function Navbar() {
     );
   }
 
+  function toggleMenu(menu: "network" | "account") {
+    setOpenMenu((current) => (current === menu ? null : menu));
+  }
+
+  function renderNetworkOptions() {
+    return menuOptions.network.map((option) => (
+      <button
+        key={option}
+        type="button"
+        onClick={() => {
+          setNetwork(option);
+          setOpenMenu(null);
+        }}
+        className={`block w-full px-4 py-3 text-left text-sm transition-colors hover:bg-orange-950/60 hover:text-orange-400 ${
+          network === option ? "text-orange-400" : "text-zinc-300"
+        }`}
+      >
+        {network === option ? "✓ " : ""}
+        {option}
+      </button>
+    ));
+  }
+
+  function renderAccountOptions() {
+    return menuOptions.account.map((option) => (
+      <button
+        key={option}
+        type="button"
+        onClick={() => selectAccountAction(option)}
+        className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-zinc-300 transition-colors hover:bg-orange-950/60 hover:text-orange-400"
+      >
+        {option === "Help" && <ExternalLinkIcon />}
+        <span>{option}</span>
+      </button>
+    ));
+  }
+
   return (
     <header
       ref={menuRef}
       className="relative z-30 border-b border-orange-950/80 bg-black"
     >
-      <div className="border-b border-orange-950/50 px-5 py-1 text-center text-[9px] text-zinc-500">
+      {/* Top demo strip */}
+      <div className="border-b border-orange-950/50 px-3 py-1 text-center text-[9px] text-zinc-500 sm:px-5">
         DEMO INTERFACE <span className="mx-2 text-orange-700">•</span>
         MOCK DATA ONLY
       </div>
 
-      <nav className="relative mx-auto flex min-h-[60px] max-w-7xl items-center justify-between gap-3 px-5 py-3 sm:px-8">
+      {/* Main navbar */}
+      <nav className="relative mx-auto flex min-h-[56px] max-w-7xl items-center justify-between gap-2 px-4 py-2 sm:min-h-[60px] sm:gap-3 sm:px-8 sm:py-3">
         <Link
           href="/"
           onClick={() => setMobileOpen(false)}
@@ -118,7 +158,8 @@ export function Navbar() {
           ZOTH<span className="text-orange-600">.</span>
         </Link>
 
-        <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center border border-orange-950 bg-[#100805] md:flex">
+        {/* Center navigation: large screens */}
+        <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center border border-orange-950 bg-[#100805] lg:flex">
           {navLinks.map((link) => (
             <a
               key={link.href}
@@ -130,14 +171,13 @@ export function Navbar() {
           ))}
         </div>
 
-        <div className="ml-auto hidden shrink-0 items-center gap-2 sm:flex">
+        {/* Desktop dropdown buttons */}
+        <div className="ml-auto hidden shrink-0 items-center gap-2 lg:flex">
           <div className="relative">
             <button
               type="button"
               aria-expanded={openMenu === "network"}
-              onClick={() =>
-                setOpenMenu(openMenu === "network" ? null : "network")
-              }
+              onClick={() => toggleMenu("network")}
               className="flex min-w-[120px] items-center justify-center gap-2 whitespace-nowrap border border-orange-900 px-3 py-2 text-sm text-white transition-colors hover:bg-orange-950/50"
             >
               {network}
@@ -146,24 +186,7 @@ export function Navbar() {
 
             {openMenu === "network" && (
               <div className="absolute right-0 top-full z-50 mt-2 w-44 border border-orange-900 bg-[#0a0604] p-1 shadow-xl">
-                {menuOptions.network.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => {
-                      setNetwork(option);
-                      setOpenMenu(null);
-                    }}
-                    className={`block w-full px-3 py-3 text-left text-sm transition-colors hover:bg-orange-950/60 hover:text-orange-400 ${
-                      network === option
-                        ? "text-orange-400"
-                        : "text-zinc-300"
-                    }`}
-                  >
-                    {network === option ? "✓ " : ""}
-                    {option}
-                  </button>
-                ))}
+                {renderNetworkOptions()}
               </div>
             )}
           </div>
@@ -172,9 +195,7 @@ export function Navbar() {
             <button
               type="button"
               aria-expanded={openMenu === "account"}
-              onClick={() =>
-                setOpenMenu(openMenu === "account" ? null : "account")
-              }
+              onClick={() => toggleMenu("account")}
               className="flex min-w-[190px] items-center justify-center gap-2 whitespace-nowrap bg-orange-600 px-3 py-2 text-sm font-semibold text-black transition-colors hover:bg-orange-500"
             >
               {accountAction}
@@ -183,35 +204,30 @@ export function Navbar() {
 
             {openMenu === "account" && (
               <div className="absolute right-0 top-full z-50 mt-2 w-56 border border-orange-900 bg-[#0a0604] p-1 shadow-xl">
-                {menuOptions.account.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => selectAccountAction(option)}
-                    className="flex w-full items-center gap-3 px-3 py-3 text-left text-sm text-zinc-300 transition-colors hover:bg-orange-950/60 hover:text-orange-400"
-                  >
-                    {option === "Help" && <ExternalLinkIcon />}
-                    <span>{option}</span>
-                  </button>
-                ))}
+                {renderAccountOptions()}
               </div>
             )}
           </div>
         </div>
 
+        {/* Hamburger: mobile and tablet */}
         <button
           type="button"
-          className="flex h-8 w-8 shrink-0 items-center justify-center border border-orange-950 text-white sm:hidden"
+          className="flex h-9 w-9 shrink-0 items-center justify-center border border-orange-950 text-lg text-white lg:hidden"
           aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
           aria-expanded={mobileOpen}
-          onClick={() => setMobileOpen((value) => !value)}
+          onClick={() => {
+            setMobileOpen((value) => !value);
+            setOpenMenu(null);
+          }}
         >
           {mobileOpen ? "×" : "☰"}
         </button>
       </nav>
 
+      {/* Demo notice */}
       {notice && (
-        <div className="border-t border-orange-950 px-5 py-2 text-center text-xs text-orange-300">
+        <div className="border-t border-orange-950 px-3 py-1.5 text-center text-[11px] leading-5 text-orange-300 sm:px-5 sm:py-2 sm:text-xs">
           {notice}
           <button
             type="button"
@@ -223,39 +239,60 @@ export function Navbar() {
         </div>
       )}
 
+      {/* Mobile and tablet navigation */}
       {mobileOpen && (
-        <div className="border-t border-orange-950 bg-black px-5 py-3 sm:hidden">
+        <div className="border-t border-orange-950 bg-black px-4 py-3 lg:hidden">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              onClick={() => setMobileOpen(false)}
-              className="block border-b border-zinc-900 py-3 text-sm text-zinc-300 last:border-0"
+              onClick={() => {
+                setMobileOpen(false);
+                setOpenMenu(null);
+              }}
+              className="block border-b border-zinc-900 py-2.5 text-sm text-zinc-300 transition-colors hover:text-orange-400 last:border-0"
             >
               {link.label}
             </a>
           ))}
 
-          <p className="py-3 text-sm text-zinc-500">
-            Network: {network}
-          </p>
+          {/* Mobile network dropdown */}
+          <div className="relative mt-3">
+            <button
+              type="button"
+              aria-expanded={openMenu === "network"}
+              onClick={() => toggleMenu("network")}
+              className="flex w-full items-center justify-between border border-orange-900 px-4 py-3 text-sm text-white"
+            >
+              <span>{network}</span>
+              <DropdownArrow open={openMenu === "network"} />
+            </button>
 
-          <button
-            type="button"
-            onClick={() => selectAccountAction("Connect wallet (demo)")}
-            className="w-full bg-orange-600 px-4 py-3 text-sm font-semibold text-black"
-          >
-            Connect wallet (demo)
-          </button>
+            {openMenu === "network" && (
+              <div className="border border-t-0 border-orange-900 bg-[#0a0604]">
+                {renderNetworkOptions()}
+              </div>
+            )}
+          </div>
 
-          <button
-            type="button"
-            onClick={() => selectAccountAction("Help")}
-            className="mt-2 flex w-full items-center justify-center gap-2 border border-orange-900 px-4 py-3 text-sm text-zinc-300"
-          >
-            <ExternalLinkIcon />
-            Help
-          </button>
+          {/* Mobile account dropdown */}
+          <div className="relative mt-2">
+            <button
+              type="button"
+              aria-expanded={openMenu === "account"}
+              onClick={() => toggleMenu("account")}
+              className="flex w-full items-center justify-between gap-3 bg-orange-600 px-4 py-3 text-sm font-semibold text-black"
+            >
+              <span>{accountAction}</span>
+              <DropdownArrow open={openMenu === "account"} />
+            </button>
+
+            {openMenu === "account" && (
+              <div className="border border-orange-900 bg-[#0a0604]">
+                {renderAccountOptions()}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </header>
